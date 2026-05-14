@@ -14,10 +14,16 @@ function LogoIcon(): React.JSX.Element {
       {/* Arrowhead ↑ */}
       <polygon points="2.2,22.7 7.8,23.2 5.5,16.5" fill="var(--accent)" />
 
-      {/* Controller outline */}
-      <rect x="14" y="18.5" width="16" height="8.5" rx="4.25" stroke="var(--accent)" strokeWidth="1.75" />
-      <ellipse cx="14" cy="22.75" rx="3.25" ry="3.25" stroke="var(--accent)" strokeWidth="1.75" />
-      <ellipse cx="30" cy="22.75" rx="3.25" ry="3.25" stroke="var(--accent)" strokeWidth="1.75" />
+      {/* D-pad cross */}
+      <polygon
+        points="19,14 25,14 25,19 30,19 30,25 25,25 25,30 19,30 19,25 14,25 14,19 19,19"
+        fill="var(--logo-dpad)"
+      />
+      {/* Directional arrows — negative cut-out */}
+      <polygon points="22,15.5 20,19 24,19"   fill="var(--bg)" />
+      <polygon points="22,28.5 20,25 24,25"   fill="var(--bg)" />
+      <polygon points="15.5,22 19,20 19,24"   fill="var(--bg)" />
+      <polygon points="28.5,22 25,20 25,24"   fill="var(--bg)" />
     </svg>
   )
 }

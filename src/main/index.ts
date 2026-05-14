@@ -13,7 +13,7 @@ function createWindow(): void {
     show: false,
     autoHideMenuBar: true,
     title: 'CheatSync for MinUI',
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false

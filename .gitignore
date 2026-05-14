@@ -26,3 +26,6 @@ dev-app-update.yml
 # Environment
 .env
 .env.*
+
+# Icon generation temp dir
+.icon-tmp

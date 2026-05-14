@@ -1,9 +1,10 @@
-# CheatSync for MinUI
-
-> Desktop app that auto-downloads `.cht` cheat files from [libretro-database](https://github.com/libretro/libretro-database) for your MinUI ROM collection.
-
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+<div align="center">
+  <img src="resources/icon.png" width="100" alt="CheatSync">
+  <h1>CheatSync for MinUI</h1>
+  <p>Desktop app that auto-downloads <code>.cht</code> cheat files from <a href="https://github.com/libretro/libretro-database">libretro-database</a> for your MinUI ROM collection.</p>
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+</div>
 
 ## Features
 
