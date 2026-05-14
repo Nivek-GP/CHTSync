@@ -1,10 +1,10 @@
 {
   "name": "cheatsync",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "Desktop app to auto-download .cht cheat files from libretro-database for your MinUI ROM collection",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Nivek-GP",
+  "homepage": "https://github.com/Nivek-GP/CheatSync",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
