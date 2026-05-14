@@ -3,6 +3,7 @@ import pngToIco from 'png-to-ico'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { execSync } from 'child_process'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -50,4 +51,30 @@ fs.writeFileSync(path.join(root, 'build', 'icon.ico'), icoBuffer)
 console.log('✓ build/icon.ico')
 
 fs.rmSync(tmpDir, { recursive: true })
+
+// ICNS with all required sizes for macOS
+const iconsetDir = path.join(root, '.icon-tmp.iconset')
+fs.mkdirSync(iconsetDir, { recursive: true })
+
+const icnsSizes = [
+  { size: 16,   name: 'icon_16x16.png' },
+  { size: 32,   name: 'icon_16x16@2x.png' },
+  { size: 32,   name: 'icon_32x32.png' },
+  { size: 64,   name: 'icon_32x32@2x.png' },
+  { size: 128,  name: 'icon_128x128.png' },
+  { size: 256,  name: 'icon_128x128@2x.png' },
+  { size: 256,  name: 'icon_256x256.png' },
+  { size: 512,  name: 'icon_256x256@2x.png' },
+  { size: 512,  name: 'icon_512x512.png' },
+  { size: 1024, name: 'icon_512x512@2x.png' },
+]
+
+for (const { size, name } of icnsSizes) {
+  fs.writeFileSync(path.join(iconsetDir, name), renderPng(size))
+}
+
+execSync(`iconutil --convert icns "${iconsetDir}" -o "${path.join(root, 'build', 'icon.icns')}"`)
+fs.rmSync(iconsetDir, { recursive: true })
+console.log('✓ build/icon.icns')
+
 console.log('\nIcons generated successfully.')

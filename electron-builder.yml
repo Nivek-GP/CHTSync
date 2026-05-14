@@ -1,5 +1,6 @@
 appId: com.nivek-gp.cheatsync
 productName: CheatSync
+afterSign: scripts/after-pack.mjs
 directories:
   buildResources: build
 files:
