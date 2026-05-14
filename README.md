@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Nivek-GP/CheatSync/main/resources/icon.png" width="100" alt="CheatSync">
+  <img src="https://raw.githubusercontent.com/Nivek-GP/CheatSync/9b6c43f/resources/icon.png" width="100" alt="CheatSync">
   <h1>CheatSync for MinUI</h1>
   <p>Desktop app that auto-downloads <code>.cht</code> cheat files from <a href="https://github.com/libretro/libretro-database">libretro-database</a> for your MinUI ROM collection.</p>
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS-blue" alt="Platform">
