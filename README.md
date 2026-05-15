@@ -81,3 +81,4 @@ npm run build:mac  # macOS disk image (.dmg)
 
 - [MinUI — Miyoo Flip Enhanced](https://github.com/Nivek-GP/MinUI-Miyoo-Flip-Enhanced) — the MinUI fork this tool was built for
 - [libretro-database](https://github.com/libretro/libretro-database) — source of all cheat files
+- [ArtSync for MinUI](https://github.com/Nivek-GP/ArtSync) — companion app to sync boxart
