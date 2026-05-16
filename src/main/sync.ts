@@ -51,6 +51,37 @@ interface Game {
   outName: string
 }
 
+function cleanCht(content: string): string {
+  const lines = content.split(/\r?\n/)
+  const parsed: Record<number, { desc?: string; enable?: string; code?: string }> = {}
+
+  for (const line of lines) {
+    let m: RegExpExecArray | null
+    if ((m = /^cheat(\d+)_desc\s*=\s*"(.*)"\s*$/.exec(line))) {
+      const i = Number(m[1]);(parsed[i] ??= {}).desc = m[2].trim()
+    } else if ((m = /^cheat(\d+)_enable\s*=\s*(.+?)\s*$/.exec(line))) {
+      const i = Number(m[1]);(parsed[i] ??= {}).enable = m[2]
+    } else if ((m = /^cheat(\d+)_code\s*=\s*"(.*)"\s*$/.exec(line))) {
+      const i = Number(m[1]);(parsed[i] ??= {}).code = m[2]
+    }
+  }
+
+  const seen = new Set<string>()
+  const unique = Object.keys(parsed)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .map(i => parsed[i])
+    .filter((e): e is { desc: string; enable: string; code: string } =>
+      !!e.desc && e.enable !== undefined && !!e.code && !seen.has(e.code) && !!seen.add(e.code)
+    )
+
+  const out: string[] = [`cheats = ${unique.length}`, '']
+  unique.forEach((e, i) => {
+    out.push(`cheat${i}_desc = "${e.desc}"`, `cheat${i}_enable = ${e.enable}`, `cheat${i}_code = "${e.code}"`, '')
+  })
+  return out.join('\n')
+}
+
 function getBaseName(name: string): string {
   return name
     .replace(/\s*\([^)]*\)/g, '')
@@ -254,7 +285,7 @@ export async function runSync(
       try {
         const bytes = await downloadBytes(rawUrl, config.githubToken)
         if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true })
-        fs.writeFileSync(outPath, bytes)
+        fs.writeFileSync(outPath, cleanCht(bytes.toString('utf8')), 'utf8')
         onLog({ type: 'ok', message: game.romName, detail: matchFile })
         totalDownloaded++
       } catch (err) {
