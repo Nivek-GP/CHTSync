@@ -57,6 +57,8 @@ export default function App(): React.JSX.Element {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Set<string>>(new Set())
   const [force, setForce] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const [cleaning, setCleaning] = useState(false)
+  const [lastMode, setLastMode] = useState<'sync' | 'cleanup'>('sync')
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [stats, setStats] = useState<SyncStats>({ downloaded: 0, skipped: 0, noMatch: 0 })
   const logRef = useRef<HTMLDivElement>(null)
@@ -100,6 +102,7 @@ export default function App(): React.JSX.Element {
   const startSync = async (): Promise<void> => {
     if (!romsRoot || !cheatsRoot) return
     setSyncing(true)
+    setLastMode('sync')
     setLogs([])
     setStats({ downloaded: 0, skipped: 0, noMatch: 0 })
 
@@ -119,7 +122,25 @@ export default function App(): React.JSX.Element {
     setSyncing(false)
   }
 
-  const canStart = Boolean(romsRoot && cheatsRoot && selectedPlatforms.size > 0 && !syncing)
+  const startCleanup = async (): Promise<void> => {
+    if (!romsRoot || !cheatsRoot) return
+    setCleaning(true)
+    setLastMode('cleanup')
+    setLogs([])
+    setStats({ downloaded: 0, skipped: 0, noMatch: 0 })
+
+    const unsub1 = window.api.onSyncLog((entry) => setLogs((prev) => [...prev, entry]))
+    const unsub2 = window.api.onSyncStats((s) => setStats(s))
+
+    await window.api.startCleanup({ romsRoot, cheatsRoot, platforms: [...selectedPlatforms] })
+
+    unsub1()
+    unsub2()
+    setCleaning(false)
+  }
+
+  const canStart = Boolean(romsRoot && cheatsRoot && selectedPlatforms.size > 0 && !syncing && !cleaning)
+  const canClean = Boolean(romsRoot && cheatsRoot && selectedPlatforms.size > 0 && !syncing && !cleaning)
 
   const logIcon = (type: LogEntry['type']): string => {
     switch (type) {
@@ -238,11 +259,20 @@ export default function App(): React.JSX.Element {
         <div className="action-row">
           {syncing ? (
             <button className="btn-cancel" onClick={() => window.api.cancelSync()}>
-              Cancel
+              Cancel Sync
             </button>
           ) : (
             <button className="btn-primary" onClick={startSync} disabled={!canStart}>
               Start Sync
+            </button>
+          )}
+          {cleaning ? (
+            <button className="btn-cancel" onClick={() => window.api.cancelCleanup()}>
+              Cancel Cleanup
+            </button>
+          ) : (
+            <button className="btn-secondary" onClick={startCleanup} disabled={!canClean}>
+              Clean Orphaned Cheats
             </button>
           )}
         </div>
@@ -260,9 +290,9 @@ export default function App(): React.JSX.Element {
               ))}
             </div>
             <div className="stats-bar">
-              <span className="stat-ok">✓ {stats.downloaded} downloaded</span>
-              <span className="stat-skip">~ {stats.skipped} skipped</span>
-              <span className="stat-none">- {stats.noMatch} no match</span>
+              <span className="stat-ok">✓ {stats.downloaded} {lastMode === 'cleanup' ? 'deleted' : 'downloaded'}</span>
+              <span className="stat-skip">~ {stats.skipped} {lastMode === 'cleanup' ? 'kept' : 'skipped'}</span>
+              <span className="stat-none">- {stats.noMatch} {lastMode === 'cleanup' ? 'errors' : 'no match'}</span>
             </div>
           </section>
         )}

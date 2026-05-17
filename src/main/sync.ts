@@ -304,3 +304,89 @@ export async function runSync(
     onLog({ type: 'info', message: 'Sync cancelled.' })
   }
 }
+
+export async function runCleanup(
+  config: Pick<SyncConfig, 'romsRoot' | 'cheatsRoot' | 'platforms'>,
+  onLog: (entry: LogEntry) => void,
+  onStats: (deleted: number, kept: number, errors: number) => void
+): Promise<void> {
+  cancelFlag = false
+  let deleted = 0, kept = 0, errors = 0
+
+  const selectedPlatforms = ALL_PLATFORMS.filter((p) => config.platforms.includes(p.tag))
+
+  for (const platform of selectedPlatforms) {
+    if (cancelFlag) break
+
+    const cheatsDir = path.join(config.cheatsRoot, platform.tag)
+    if (!fs.existsSync(cheatsDir)) {
+      onLog({ type: 'info', message: `[${platform.tag}] No cheats folder, skipping.` })
+      continue
+    }
+
+    let romDir: string | null = null
+    try {
+      for (const e of fs.readdirSync(config.romsRoot, { withFileTypes: true })) {
+        if (e.isDirectory() && e.name.toLowerCase().includes(platform.match.toLowerCase())) {
+          romDir = path.join(config.romsRoot, e.name)
+          break
+        }
+      }
+    } catch {}
+
+    onLog({
+      type: 'platform',
+      message: `[${platform.tag}] ${romDir ? path.basename(romDir) : 'ROM dir not found'}`
+    })
+
+    const chtFiles = fs.readdirSync(cheatsDir).filter((f) => f.toLowerCase().endsWith('.cht'))
+
+    for (const chtFile of chtFiles) {
+      if (cancelFlag) break
+
+      const romFilename = chtFile.slice(0, -4)
+      const chtPath = path.join(cheatsDir, chtFile)
+
+      if (!romDir) {
+        onLog({ type: 'skip', message: romFilename + ' (no ROM dir, keeping)' })
+        kept++
+        onStats(deleted, kept, errors)
+        continue
+      }
+
+      let romExists = false
+      try {
+        romExists = findFilesRecursive(romDir, (n) => n === romFilename).length > 0
+      } catch {
+        onLog({ type: 'skip', message: romFilename + ' (read error, keeping)' })
+        kept++
+        onStats(deleted, kept, errors)
+        continue
+      }
+
+      if (romExists) {
+        onLog({ type: 'skip', message: romFilename })
+        kept++
+      } else {
+        try {
+          fs.unlinkSync(chtPath)
+          onLog({ type: 'ok', message: romFilename + ' — deleted' })
+          deleted++
+        } catch (err) {
+          onLog({ type: 'error', message: `${romFilename}: ${err}` })
+          errors++
+        }
+      }
+      onStats(deleted, kept, errors)
+    }
+  }
+
+  if (!cancelFlag) {
+    onLog({
+      type: 'summary',
+      message: `Done — Deleted: ${deleted} | Kept: ${kept} | Errors: ${errors}`
+    })
+  } else {
+    onLog({ type: 'info', message: 'Cleanup cancelled.' })
+  }
+}
