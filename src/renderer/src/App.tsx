@@ -57,7 +57,9 @@ export default function App(): React.JSX.Element {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Set<string>>(new Set())
   const [force, setForce] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const [scanning, setScanning] = useState(false)
   const [cleaning, setCleaning] = useState(false)
+  const [orphanCount, setOrphanCount] = useState<number | null>(null)
   const [lastMode, setLastMode] = useState<'sync' | 'cleanup'>('sync')
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [stats, setStats] = useState<SyncStats>({ downloaded: 0, skipped: 0, noMatch: 0 })
@@ -68,9 +70,10 @@ export default function App(): React.JSX.Element {
     localStorage.setItem('theme', theme)
   }, [theme])
 
-  useEffect(() => { localStorage.setItem('romsRoot', romsRoot) }, [romsRoot])
-  useEffect(() => { localStorage.setItem('cheatsRoot', cheatsRoot) }, [cheatsRoot])
+  useEffect(() => { localStorage.setItem('romsRoot', romsRoot); setOrphanCount(null) }, [romsRoot])
+  useEffect(() => { localStorage.setItem('cheatsRoot', cheatsRoot); setOrphanCount(null) }, [cheatsRoot])
   useEffect(() => { localStorage.setItem('githubToken', githubToken) }, [githubToken])
+  useEffect(() => { setOrphanCount(null) }, [selectedPlatforms])
 
   useEffect(() => {
     window.api.getPlatforms().then((p) => {
@@ -122,6 +125,14 @@ export default function App(): React.JSX.Element {
     setSyncing(false)
   }
 
+  const scanForOrphans = async (): Promise<void> => {
+    if (!romsRoot || !cheatsRoot) return
+    setScanning(true)
+    const count = await window.api.scanOrphans({ romsRoot, cheatsRoot, platforms: [...selectedPlatforms] })
+    setOrphanCount(count)
+    setScanning(false)
+  }
+
   const startCleanup = async (): Promise<void> => {
     if (!romsRoot || !cheatsRoot) return
     setCleaning(true)
@@ -137,6 +148,7 @@ export default function App(): React.JSX.Element {
     unsub1()
     unsub2()
     setCleaning(false)
+    setOrphanCount(null)
   }
 
   const canStart = Boolean(romsRoot && cheatsRoot && selectedPlatforms.size > 0 && !syncing && !cleaning)
@@ -270,9 +282,13 @@ export default function App(): React.JSX.Element {
             <button className="btn-cancel" onClick={() => window.api.cancelCleanup()}>
               Cancel Cleanup
             </button>
+          ) : orphanCount !== null ? (
+            <button className="btn-secondary btn-confirm" onClick={startCleanup} disabled={!canClean}>
+              Delete {orphanCount} Cheats
+            </button>
           ) : (
-            <button className="btn-secondary" onClick={startCleanup} disabled={!canClean}>
-              Clean Orphaned Cheats
+            <button className="btn-secondary" onClick={scanForOrphans} disabled={!canClean || scanning}>
+              {scanning ? 'Scanning...' : 'Clean Cheats'}
             </button>
           )}
         </div>

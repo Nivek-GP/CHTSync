@@ -42,6 +42,7 @@ declare global {
       cancelSync: () => void
       onSyncLog: (callback: (entry: LogEntry) => void) => () => void
       onSyncStats: (callback: (stats: SyncStats) => void) => () => void
+      scanOrphans: (config: CleanupConfig) => Promise<number>
       startCleanup: (config: CleanupConfig) => Promise<void>
       cancelCleanup: () => void
     }

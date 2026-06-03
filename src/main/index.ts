@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { runSync, cancelSync, runCleanup, ALL_PLATFORMS } from './sync'
+import { runSync, cancelSync, runCleanup, scanOrphans, ALL_PLATFORMS } from './sync'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -58,6 +58,10 @@ app.whenReady().then(() => {
       (downloaded, skipped, noMatch) =>
         win?.webContents.send('sync-stats', { downloaded, skipped, noMatch })
     )
+  })
+
+  ipcMain.handle('scan-orphans', async (_event, config) => {
+    return scanOrphans(config)
   })
 
   ipcMain.handle('start-cleanup', async (event, config) => {

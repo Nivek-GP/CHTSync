@@ -9,22 +9,39 @@ export interface Platform {
 
 export const ALL_PLATFORMS: Platform[] = [
   { match: 'PlayStation (PS)', tag: 'PS', libretro: 'Sony - PlayStation' },
+  { match: 'PlayStation Portable (PSP)', tag: 'PSP', libretro: 'Sony - PlayStation Portable' },
+  { match: 'Sega Dreamcast (DC)', tag: 'DC', libretro: 'Sega - Dreamcast' },
+  { match: 'Nintendo 64 (N64)', tag: 'N64', libretro: 'Nintendo - Nintendo 64' },
+  { match: 'Nintendo DS (NDS)', tag: 'NDS', libretro: 'Nintendo - Nintendo DS' },
   { match: 'Game Boy Advance (GBA)', tag: 'GBA', libretro: 'Nintendo - Game Boy Advance' },
-  { match: 'Super Nintendo', tag: 'SFC', libretro: 'Nintendo - Super Nintendo Entertainment System' },
-  { match: 'Game Boy Color', tag: 'GBC', libretro: 'Nintendo - Game Boy Color' },
-  { match: 'Game Boy', tag: 'GB', libretro: 'Nintendo - Game Boy' },
-  { match: 'Nintendo (FC)', tag: 'FC', libretro: 'Nintendo - Nintendo Entertainment System' },
-  { match: 'Sega Genesis', tag: 'MD', libretro: 'Sega - Mega Drive - Genesis' },
-  { match: 'Sega Master System', tag: 'SMS', libretro: 'Sega - Master System - Mark III' },
-  { match: 'Game Gear', tag: 'GG', libretro: 'Sega - Game Gear' },
-  { match: 'PC Engine', tag: 'PCE', libretro: 'NEC - PC Engine - TurboGrafx 16' },
-  { match: 'Neo Geo Pocket', tag: 'NGP', libretro: 'SNK - Neo Geo Pocket Color' }
+  { match: 'Game Boy Advance (MGBA)', tag: 'MGBA', libretro: 'Nintendo - Game Boy Advance' },
+  { match: 'Super Nintendo (SFC)', tag: 'SFC', libretro: 'Nintendo - Super Nintendo Entertainment System' },
+  { match: 'Super Nintendo (SUPA)', tag: 'SUPA', libretro: 'Nintendo - Super Nintendo Entertainment System' },
+  { match: 'Super Game Boy (SGB)', tag: 'SGB', libretro: 'Nintendo - Game Boy' },
+  { match: 'Game Boy Color (GBC)', tag: 'GBC', libretro: 'Nintendo - Game Boy Color' },
+  { match: 'Game Boy (GB)', tag: 'GB', libretro: 'Nintendo - Game Boy' },
+  { match: 'Nintendo NES (FC)', tag: 'FC', libretro: 'Nintendo - Nintendo Entertainment System' },
+  { match: 'Virtual Boy (VB)', tag: 'VB', libretro: 'Nintendo - Virtual Boy' },
+  { match: 'Pokémon mini (PKM)', tag: 'PKM', libretro: 'Nintendo - Pokemon Mini' },
+  { match: 'Sega Genesis (MD)', tag: 'MD', libretro: 'Sega - Mega Drive - Genesis' },
+  { match: 'Sega Master System (SMS)', tag: 'SMS', libretro: 'Sega - Master System - Mark III' },
+  { match: 'Sega Game Gear (GG)', tag: 'GG', libretro: 'Sega - Game Gear' },
+  { match: 'TurboGrafx-16 (PCE)', tag: 'PCE', libretro: 'NEC - PC Engine - TurboGrafx 16' },
+  { match: 'Neo Geo Pocket Color (NGPC)', tag: 'NGPC', libretro: 'SNK - Neo Geo Pocket Color' },
+  { match: 'Arcade (FBNEO)', tag: 'FBNEO', libretro: 'FBNeo - Arcade Games' },
+  { match: 'Vertical Arcade (VARCADE)', tag: 'VARCADE', libretro: 'FBNeo - Arcade Games' }
 ]
 
 const ROM_EXTS = new Set([
   '.bin', '.cue', '.iso', '.pbp', '.chd', '.img', '.cso',
   '.smc', '.sfc', '.gb', '.gbc', '.gba', '.nes', '.fds',
-  '.md', '.sms', '.gg', '.pce', '.ngp', '.ngc', '.m3u'
+  '.md', '.sms', '.gg', '.pce', '.ngp', '.ngc', '.m3u',
+  '.z64', '.n64', '.v64',
+  '.nds',
+  '.gdi', '.cdi',
+  '.vb',
+  '.min',
+  '.zip'
 ])
 
 const DEVICE_PREF = [
@@ -305,6 +322,46 @@ export async function runSync(
   }
 }
 
+export async function scanOrphans(
+  config: Pick<SyncConfig, 'romsRoot' | 'cheatsRoot' | 'platforms'>
+): Promise<number> {
+  const selectedPlatforms = ALL_PLATFORMS.filter((p) => config.platforms.includes(p.tag))
+  let count = 0
+
+  for (const platform of selectedPlatforms) {
+    const cheatsDir = path.join(config.cheatsRoot, platform.tag)
+    if (!fs.existsSync(cheatsDir)) continue
+
+    let romDir: string | null = null
+    try {
+      for (const e of fs.readdirSync(config.romsRoot, { withFileTypes: true })) {
+        if (e.isDirectory() && e.name.toLowerCase().includes(platform.match.toLowerCase())) {
+          romDir = path.join(config.romsRoot, e.name)
+          break
+        }
+      }
+    } catch {}
+
+    const chtFiles = fs.readdirSync(cheatsDir).filter((f) => f.toLowerCase().endsWith('.cht'))
+
+    if (!romDir) {
+      count += chtFiles.length
+      continue
+    }
+
+    for (const chtFile of chtFiles) {
+      const romFilename = chtFile.slice(0, -4)
+      let romExists = false
+      try {
+        romExists = findFilesRecursive(romDir, (n) => n === romFilename).length > 0
+      } catch {}
+      if (!romExists) count++
+    }
+  }
+
+  return count
+}
+
 export async function runCleanup(
   config: Pick<SyncConfig, 'romsRoot' | 'cheatsRoot' | 'platforms'>,
   onLog: (entry: LogEntry) => void,
@@ -334,25 +391,39 @@ export async function runCleanup(
       }
     } catch {}
 
+    const chtFiles = fs.readdirSync(cheatsDir).filter((f) => f.toLowerCase().endsWith('.cht'))
+
+    if (!romDir) {
+      onLog({
+        type: 'platform',
+        message: `[${platform.tag}] ROM folder not found — deleting all ${chtFiles.length} orphaned cheats`
+      })
+      for (const chtFile of chtFiles) {
+        if (cancelFlag) break
+        const chtPath = path.join(cheatsDir, chtFile)
+        try {
+          fs.unlinkSync(chtPath)
+          onLog({ type: 'ok', message: chtFile.slice(0, -4) + ' — deleted' })
+          deleted++
+        } catch (err) {
+          onLog({ type: 'error', message: `${chtFile}: ${err}` })
+          errors++
+        }
+        onStats(deleted, kept, errors)
+      }
+      continue
+    }
+
     onLog({
       type: 'platform',
-      message: `[${platform.tag}] ${romDir ? path.basename(romDir) : 'ROM dir not found'}`
+      message: `[${platform.tag}] ${path.basename(romDir)}`
     })
-
-    const chtFiles = fs.readdirSync(cheatsDir).filter((f) => f.toLowerCase().endsWith('.cht'))
 
     for (const chtFile of chtFiles) {
       if (cancelFlag) break
 
       const romFilename = chtFile.slice(0, -4)
       const chtPath = path.join(cheatsDir, chtFile)
-
-      if (!romDir) {
-        onLog({ type: 'skip', message: romFilename + ' (no ROM dir, keeping)' })
-        kept++
-        onStats(deleted, kept, errors)
-        continue
-      }
 
       let romExists = false
       try {

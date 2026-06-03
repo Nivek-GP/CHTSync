@@ -394,6 +394,16 @@ button:hover {
   cursor: not-allowed;
 }
 
+.btn-secondary.btn-confirm {
+  background: color-mix(in srgb, var(--col-err) 8%, transparent);
+  border-color: color-mix(in srgb, var(--col-err) 40%, transparent);
+  color: var(--col-err);
+}
+
+.btn-secondary.btn-confirm:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--col-err) 15%, transparent);
+}
+
 /* ── Log ─────────────────────────────────────────────────── */
 
 .log-card {

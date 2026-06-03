@@ -6,6 +6,7 @@ const api = {
   getPlatforms: () => ipcRenderer.invoke('get-platforms'),
   startSync: (config: unknown): Promise<void> => ipcRenderer.invoke('start-sync', config),
   cancelSync: (): void => { ipcRenderer.send('cancel-sync') },
+  scanOrphans: (config: unknown): Promise<number> => ipcRenderer.invoke('scan-orphans', config),
   startCleanup: (config: unknown): Promise<void> => ipcRenderer.invoke('start-cleanup', config),
   cancelCleanup: (): void => { ipcRenderer.send('cancel-sync') },
   onSyncLog: (callback: (entry: unknown) => void): (() => void) => {
