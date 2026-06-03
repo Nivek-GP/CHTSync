@@ -1,6 +1,6 @@
 {
   "name": "cheatsync",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Desktop app to auto-download .cht cheat files from libretro-database for your MinUI ROM collection",
   "main": "./out/main/index.js",
   "author": "Nivek-GP",
