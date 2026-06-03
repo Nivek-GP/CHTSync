@@ -9,7 +9,8 @@
 ## Features
 
 - **Auto-match** — fuzzy matching by game name, region, and cheat device preference (GameShark > Action Replay > ... > Game Buster)
-- **11 platforms** — PS, GBA, SFC, GBC, GB, FC, MD, SMS, GG, PCE, NGP
+- **22 platforms** — PS, PSP, DC, N64, NDS, GBA, MGBA, SFC, SUPA, SGB, GBC, GB, FC, VB, PKM, MD, SMS, GG, PCE, NGPC, FBNEO, VARCADE
+- **Two-step orphan cleanup** — scan to preview the count, then confirm with one click to delete
 - **Live log** — color-coded output as files download
 - **Skip / Force** — skips already-downloaded files by default; force re-download with one toggle
 - **GitHub Token** — optional, raises API rate limit from 60 to 5,000 requests/hr
@@ -55,16 +56,27 @@ Generate one at **GitHub → Settings → Developer settings → Personal access
 | Tag | System |
 | -- | -- |
 | PS | Sony PlayStation |
+| PSP | Sony PlayStation Portable |
+| DC | Sega Dreamcast |
+| N64 | Nintendo 64 |
+| NDS | Nintendo DS |
 | GBA | Nintendo Game Boy Advance |
+| MGBA | Nintendo Game Boy Advance (mGBA core) |
 | SFC | Super Nintendo |
+| SUPA | Super Nintendo (Supa core) |
+| SGB | Super Game Boy |
 | GBC | Game Boy Color |
 | GB | Game Boy |
 | FC | Nintendo Entertainment System |
+| VB | Nintendo Virtual Boy |
+| PKM | Nintendo Pokémon mini |
 | MD | Sega Mega Drive / Genesis |
 | SMS | Sega Master System |
 | GG | Sega Game Gear |
 | PCE | NEC PC Engine / TurboGrafx-16 |
-| NGP | SNK Neo Geo Pocket Color |
+| NGPC | SNK Neo Geo Pocket Color |
+| FBNEO | Arcade (FBNeo) |
+| VARCADE | Vertical Arcade (FBNeo) |
 
 ## Building from source
 
