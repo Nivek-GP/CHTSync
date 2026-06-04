@@ -51,7 +51,7 @@ export default function App(): React.JSX.Element {
     return (localStorage.getItem('theme') as 'dark' | 'light') ?? 'dark'
   })
   const [romsRoot, setRomsRoot] = useState(() => localStorage.getItem('romsRoot') ?? '')
-  const [cheatsRoot, setCheatsRoot] = useState(() => localStorage.getItem('cheatsRoot') ?? '')
+  const [chtsRoot, setChtsRoot] = useState(() => localStorage.getItem('chtsRoot') ?? '')
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem('githubToken') ?? '')
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [selectedPlatforms, setSelectedPlatforms] = useState<Set<string>>(new Set())
@@ -71,7 +71,7 @@ export default function App(): React.JSX.Element {
   }, [theme])
 
   useEffect(() => { localStorage.setItem('romsRoot', romsRoot); setOrphanCount(null) }, [romsRoot])
-  useEffect(() => { localStorage.setItem('cheatsRoot', cheatsRoot); setOrphanCount(null) }, [cheatsRoot])
+  useEffect(() => { localStorage.setItem('chtsRoot', chtsRoot); setOrphanCount(null) }, [chtsRoot])
   useEffect(() => { localStorage.setItem('githubToken', githubToken) }, [githubToken])
   useEffect(() => { setOrphanCount(null) }, [selectedPlatforms])
 
@@ -103,7 +103,7 @@ export default function App(): React.JSX.Element {
   }
 
   const startSync = async (): Promise<void> => {
-    if (!romsRoot || !cheatsRoot) return
+    if (!romsRoot || !chtsRoot) return
     setSyncing(true)
     setLastMode('sync')
     setLogs([])
@@ -114,7 +114,7 @@ export default function App(): React.JSX.Element {
 
     await window.api.startSync({
       romsRoot,
-      cheatsRoot,
+      chtsRoot,
       githubToken: githubToken || undefined,
       platforms: [...selectedPlatforms],
       force
@@ -126,15 +126,15 @@ export default function App(): React.JSX.Element {
   }
 
   const scanForOrphans = async (): Promise<void> => {
-    if (!romsRoot || !cheatsRoot) return
+    if (!romsRoot || !chtsRoot) return
     setScanning(true)
-    const count = await window.api.scanOrphans({ romsRoot, cheatsRoot, platforms: [...selectedPlatforms] })
+    const count = await window.api.scanOrphans({ romsRoot, chtsRoot, platforms: [...selectedPlatforms] })
     setOrphanCount(count)
     setScanning(false)
   }
 
   const startCleanup = async (): Promise<void> => {
-    if (!romsRoot || !cheatsRoot) return
+    if (!romsRoot || !chtsRoot) return
     setCleaning(true)
     setLastMode('cleanup')
     setLogs([])
@@ -143,7 +143,7 @@ export default function App(): React.JSX.Element {
     const unsub1 = window.api.onSyncLog((entry) => setLogs((prev) => [...prev, entry]))
     const unsub2 = window.api.onSyncStats((s) => setStats(s))
 
-    await window.api.startCleanup({ romsRoot, cheatsRoot, platforms: [...selectedPlatforms] })
+    await window.api.startCleanup({ romsRoot, chtsRoot, platforms: [...selectedPlatforms] })
 
     unsub1()
     unsub2()
@@ -151,8 +151,8 @@ export default function App(): React.JSX.Element {
     setOrphanCount(null)
   }
 
-  const canStart = Boolean(romsRoot && cheatsRoot && selectedPlatforms.size > 0 && !syncing && !cleaning)
-  const canClean = Boolean(romsRoot && cheatsRoot && selectedPlatforms.size > 0 && !syncing && !cleaning)
+  const canStart = Boolean(romsRoot && chtsRoot && selectedPlatforms.size > 0 && !syncing && !cleaning)
+  const canClean = Boolean(romsRoot && chtsRoot && selectedPlatforms.size > 0 && !syncing && !cleaning)
 
   const logIcon = (type: LogEntry['type']): string => {
     switch (type) {
@@ -172,7 +172,7 @@ export default function App(): React.JSX.Element {
         <div className="app-logo">
           <LogoIcon />
           <div>
-            <h1>CheatSync</h1>
+            <h1>CHTSync</h1>
             <span className="logo-sub">for MinUI</span>
           </div>
         </div>
@@ -203,16 +203,16 @@ export default function App(): React.JSX.Element {
             </div>
           </div>
           <div className="folder-row">
-            <label>Cheats Folder</label>
+            <label>CHT Folder</label>
             <div className="input-row">
               <input
                 type="text"
-                value={cheatsRoot}
+                value={chtsRoot}
                 readOnly
-                placeholder="e.g. F:\Cheats"
-                onClick={() => selectFolder(setCheatsRoot)}
+                placeholder="e.g. F:\Chts"
+                onClick={() => selectFolder(setChtsRoot)}
               />
-              <button onClick={() => selectFolder(setCheatsRoot)}>Browse</button>
+              <button onClick={() => selectFolder(setChtsRoot)}>Browse</button>
             </div>
           </div>
           <div className="folder-row">
@@ -284,11 +284,11 @@ export default function App(): React.JSX.Element {
             </button>
           ) : orphanCount !== null ? (
             <button className="btn-secondary btn-confirm" onClick={startCleanup} disabled={!canClean}>
-              Delete {orphanCount} Cheats
+              Delete {orphanCount} .cht Files
             </button>
           ) : (
             <button className="btn-secondary" onClick={scanForOrphans} disabled={!canClean || scanning}>
-              {scanning ? 'Scanning...' : 'Clean Cheats'}
+              {scanning ? 'Scanning...' : 'Clean .cht Files'}
             </button>
           )}
         </div>

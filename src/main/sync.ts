@@ -51,7 +51,7 @@ const DEVICE_PREF = [
 
 export interface SyncConfig {
   romsRoot: string
-  cheatsRoot: string
+  chtsRoot: string
   githubToken?: string
   platforms: string[]
   force: boolean
@@ -195,7 +195,7 @@ function scanGames(romDir: string): Game[] {
 }
 
 async function fetchText(url: string, token?: string): Promise<string> {
-  const headers: Record<string, string> = { 'User-Agent': 'CheatSync-MinUI' }
+  const headers: Record<string, string> = { 'User-Agent': 'CHTSync-MinUI' }
   if (token) headers['Authorization'] = `token ${token}`
   const resp = await fetch(url, { headers })
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
@@ -203,7 +203,7 @@ async function fetchText(url: string, token?: string): Promise<string> {
 }
 
 async function downloadBytes(url: string, token?: string): Promise<Buffer> {
-  const headers: Record<string, string> = { 'User-Agent': 'CheatSync-MinUI' }
+  const headers: Record<string, string> = { 'User-Agent': 'CHTSync-MinUI' }
   if (token) headers['Authorization'] = `token ${token}`
   const resp = await fetch(url, { headers })
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
@@ -236,7 +236,7 @@ export async function runSync(
       tree: Array<{ path: string }>
     }
     allPaths = data.tree.filter((n) => n.path.startsWith('cht/')).map((n) => n.path)
-    onLog({ type: 'info', message: `${allPaths.length} cheat files indexed.` })
+    onLog({ type: 'info', message: `${allPaths.length} .cht files indexed.` })
   } catch (err) {
     onLog({ type: 'error', message: `Failed to fetch index: ${err}` })
     return
@@ -261,11 +261,11 @@ export async function runSync(
 
     const prefix = `cht/${platform.libretro}/`
     const candidates = allPaths.filter((p) => p.startsWith(prefix))
-    const outDir = path.join(config.cheatsRoot, platform.tag)
+    const outDir = path.join(config.chtsRoot, platform.tag)
 
     onLog({
       type: 'platform',
-      message: `[${platform.tag}] ${path.basename(romDir)} — ${candidates.length} cheat files in DB`
+      message: `[${platform.tag}] ${path.basename(romDir)} — ${candidates.length} .cht files in DB`
     })
 
     if (candidates.length === 0) continue
@@ -323,14 +323,14 @@ export async function runSync(
 }
 
 export async function scanOrphans(
-  config: Pick<SyncConfig, 'romsRoot' | 'cheatsRoot' | 'platforms'>
+  config: Pick<SyncConfig, 'romsRoot' | 'chtsRoot' | 'platforms'>
 ): Promise<number> {
   const selectedPlatforms = ALL_PLATFORMS.filter((p) => config.platforms.includes(p.tag))
   let count = 0
 
   for (const platform of selectedPlatforms) {
-    const cheatsDir = path.join(config.cheatsRoot, platform.tag)
-    if (!fs.existsSync(cheatsDir)) continue
+    const chtsDir = path.join(config.chtsRoot, platform.tag)
+    if (!fs.existsSync(chtsDir)) continue
 
     let romDir: string | null = null
     try {
@@ -342,7 +342,7 @@ export async function scanOrphans(
       }
     } catch {}
 
-    const chtFiles = fs.readdirSync(cheatsDir).filter((f) => f.toLowerCase().endsWith('.cht'))
+    const chtFiles = fs.readdirSync(chtsDir).filter((f) => f.toLowerCase().endsWith('.cht'))
 
     if (!romDir) {
       count += chtFiles.length
@@ -363,7 +363,7 @@ export async function scanOrphans(
 }
 
 export async function runCleanup(
-  config: Pick<SyncConfig, 'romsRoot' | 'cheatsRoot' | 'platforms'>,
+  config: Pick<SyncConfig, 'romsRoot' | 'chtsRoot' | 'platforms'>,
   onLog: (entry: LogEntry) => void,
   onStats: (deleted: number, kept: number, errors: number) => void
 ): Promise<void> {
@@ -375,9 +375,9 @@ export async function runCleanup(
   for (const platform of selectedPlatforms) {
     if (cancelFlag) break
 
-    const cheatsDir = path.join(config.cheatsRoot, platform.tag)
-    if (!fs.existsSync(cheatsDir)) {
-      onLog({ type: 'info', message: `[${platform.tag}] No cheats folder, skipping.` })
+    const chtsDir = path.join(config.chtsRoot, platform.tag)
+    if (!fs.existsSync(chtsDir)) {
+      onLog({ type: 'info', message: `[${platform.tag}] No .cht folder, skipping.` })
       continue
     }
 
@@ -391,16 +391,16 @@ export async function runCleanup(
       }
     } catch {}
 
-    const chtFiles = fs.readdirSync(cheatsDir).filter((f) => f.toLowerCase().endsWith('.cht'))
+    const chtFiles = fs.readdirSync(chtsDir).filter((f) => f.toLowerCase().endsWith('.cht'))
 
     if (!romDir) {
       onLog({
         type: 'platform',
-        message: `[${platform.tag}] ROM folder not found — deleting all ${chtFiles.length} orphaned cheats`
+        message: `[${platform.tag}] ROM folder not found — deleting all ${chtFiles.length} orphaned .cht files`
       })
       for (const chtFile of chtFiles) {
         if (cancelFlag) break
-        const chtPath = path.join(cheatsDir, chtFile)
+        const chtPath = path.join(chtsDir, chtFile)
         try {
           fs.unlinkSync(chtPath)
           onLog({ type: 'ok', message: chtFile.slice(0, -4) + ' — deleted' })
@@ -423,7 +423,7 @@ export async function runCleanup(
       if (cancelFlag) break
 
       const romFilename = chtFile.slice(0, -4)
-      const chtPath = path.join(cheatsDir, chtFile)
+      const chtPath = path.join(chtsDir, chtFile)
 
       let romExists = false
       try {

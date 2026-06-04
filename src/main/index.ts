@@ -12,7 +12,7 @@ function createWindow(): void {
     minHeight: 560,
     show: false,
     autoHideMenuBar: true,
-    title: 'CheatSync for MinUI',
+    title: 'CHTSync for MinUI',
     icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -37,7 +37,7 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.cheatsync.minui')
+  electronApp.setAppUserModelId('com.chtsync.minui')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

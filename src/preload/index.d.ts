@@ -20,7 +20,7 @@ interface SyncStats {
 
 interface SyncConfig {
   romsRoot: string
-  cheatsRoot: string
+  chtsRoot: string
   githubToken?: string
   platforms: string[]
   force: boolean
@@ -28,7 +28,7 @@ interface SyncConfig {
 
 interface CleanupConfig {
   romsRoot: string
-  cheatsRoot: string
+  chtsRoot: string
   platforms: string[]
 }
 

@@ -1,14 +1,14 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Nivek-GP/CheatSync/9b6c43f/resources/icon.png" width="100" alt="CheatSync">
-  <h1>CheatSync for MinUI</h1>
-  <p>Desktop app that auto-downloads <code>.cht</code> cheat files from <a href="https://github.com/libretro/libretro-database">libretro-database</a> for your MinUI ROM collection.</p>
+  <img src="https://raw.githubusercontent.com/Nivek-GP/CHTSync/9b6c43f/resources/icon.png" width="100" alt="CHTSync">
+  <h1>CHTSync for MinUI</h1>
+  <p>Desktop app that auto-downloads <code>.cht</code> files from <a href="https://github.com/libretro/libretro-database">libretro-database</a> for your MinUI ROM collection.</p>
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS-blue" alt="Platform">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
 </div>
 
 ## Features
 
-- **Auto-match** — fuzzy matching by game name, region, and cheat device preference (GameShark > Action Replay > ... > Game Buster)
+- **Auto-match** — fuzzy matching by game name, region, and device preference (GameShark > Action Replay > ... > Game Buster)
 - **22 platforms** — PS, PSP, DC, N64, NDS, GBA, MGBA, SFC, SUPA, SGB, GBC, GB, FC, VB, PKM, MD, SMS, GG, PCE, NGPC, FBNEO, VARCADE
 - **Two-step orphan cleanup** — scan to preview the count, then confirm with one click to delete
 - **Live log** — color-coded output as files download
@@ -19,31 +19,31 @@
 
 ## Download
 
-Go to the [Releases page](https://github.com/Nivek-GP/CheatSync/releases) and download the installer for your platform:
+Go to the [Releases page](https://github.com/Nivek-GP/CHTSync/releases) and download the installer for your platform:
 
 | Platform | File |
 | -- | -- |
-| Windows | `CheatSync-x.x.x-setup.exe` |
-| macOS | `CheatSync-x.x.x.dmg` |
+| Windows | `CHTSync-x.x.x-setup.exe` |
+| macOS | `CHTSync-x.x.x.dmg` |
 
 ## Usage
 
 1. **ROM Folder** — select the root folder containing your ROM platform subfolders (e.g. `F:\Roms`)
-2. **Cheats Folder** — select where `.cht` files will be saved (e.g. `F:\Cheats`)
+2. **CHT Folder** — select where `.cht` files will be saved (e.g. `F:\Chts`)
 3. Select which **platforms** to process
 4. Click **Start Sync**
 
-CheatSync will index the libretro-database, match each ROM to the best available cheat file, and download it to `Cheats/{platform}/` named after the ROM file.
+CHTSync will index the libretro-database, match each ROM to the best available .cht file, and download it to `Chts/{platform}/` named after the ROM file.
 
 ### File placement
 
 Downloaded files are saved as:
 
 ```
-{CheatsRoot}/{platform}/{rom_filename}.cht
+{ChtsRoot}/{platform}/{rom_filename}.cht
 ```
 
-These are compatible with [MinUI's cheat support](https://github.com/Nivek-GP/MinUI-Miyoo-Flip-Enhanced).
+These are compatible with [MinUI's .cht support](https://github.com/Nivek-GP/MinUI-Miyoo-Flip-Enhanced).
 
 ### GitHub Token (optional)
 
@@ -92,5 +92,5 @@ npm run build:mac  # macOS disk image (.dmg)
 ## Related
 
 - [MinUI — Miyoo Flip Enhanced](https://github.com/Nivek-GP/MinUI-Miyoo-Flip-Enhanced) — the MinUI fork this tool was built for
-- [libretro-database](https://github.com/libretro/libretro-database) — source of all cheat files
+- [libretro-database](https://github.com/libretro/libretro-database) — source of all .cht files
 - [ArtSync for MinUI](https://github.com/Nivek-GP/ArtSync) — companion app to sync boxart
