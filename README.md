@@ -6,6 +6,12 @@
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
 </div>
 
+## About .cht files
+
+`.cht` is an open file format used by the [libretro](https://www.libretro.com/) emulation ecosystem to store **single-player game enhancement codes** (e.g. infinite lives, level select) for classic, offline retro games. They are unrelated to online multiplayer or competitive gaming.
+
+The [libretro-database](https://github.com/libretro/libretro-database) is a community-maintained, publicly licensed repository that distributes these files freely. CHTSync is a download-automation utility — equivalent to a package manager — that fetches those publicly available files and organises them into the folder structure expected by MinUI. No copyrighted game data is stored, bundled, or redistributed by this tool.
+
 ## Features
 
 - **Auto-match** — fuzzy matching by game name, region, and device preference (GameShark > Action Replay > ... > Game Buster)

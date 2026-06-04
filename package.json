@@ -1,7 +1,7 @@
 {
   "name": "chtsync",
   "version": "1.2.0",
-  "description": "Desktop app to auto-download .cht files from libretro-database for your MinUI ROM collection",
+  "description": "Desktop app to sync single-player game enhancement codes (.cht format) from the open-source libretro-database for retro emulation on MinUI",
   "main": "./out/main/index.js",
   "author": "Nivek-GP",
   "homepage": "https://github.com/Nivek-GP/CHTSync",
