@@ -29,3 +29,6 @@ dev-app-update.yml
 
 # Icon generation temp dir
 .icon-tmp
+
+# Claude Code local settings
+.claude/
